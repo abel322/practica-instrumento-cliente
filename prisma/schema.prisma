@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model CustomChordVoicing {
+  id         String   @id
+  instrument String   @default("guitar_6c")
+  root       String
+  chordType  String
+  shape      String
+  fretsJson  Json
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime
+
+  @@unique([instrument, root, chordType, shape])
+}
+
+model CustomProgression {
+  id         String   @id
+  name       String
+  category   String   @default("Personalizada")
+  chordsJson Json
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime
+}
+
+model CustomScalePattern {
+  id             String   @id
+  instrumentType String
+  system         String
+  scaleKey       String
+  patternId      Int
+  name           String
+  minFret        Int
+  maxFret        Int
+  notesData      Json
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime
+
+  @@unique([instrumentType, system, scaleKey, patternId])
+  @@index([instrumentType, system, scaleKey])
+}
+
+model DrumExercise {
+  id              String   @id
+  slug            String   @unique
+  title           String
+  category        String
+  difficulty      String
+  bpmDefault      Int      @default(100)
+  timeSignature   String   @default("4/4")
+  totalSteps      Int      @default(16)
+  hitsData        Json
+  createdAt       DateTime @default(now())
+  stepsPerMeasure Int?     @default(16)
+  subdivision     String?  @default("1/16")
+}
+
+model StringExercise {
+  id              String   @id
+  slug            String   @unique
+  title           String
+  instrument      String
+  tuning          String   @default("Standard")
+  category        String
+  difficulty      String
+  bpmDefault      Int      @default(90)
+  timeSignature   String   @default("4/4")
+  totalSteps      Int      @default(16)
+  tabData         Json
+  createdAt       DateTime @default(now())
+  stepsPerMeasure Int?     @default(16)
+  subdivision     String?  @default("1/16")
+}
