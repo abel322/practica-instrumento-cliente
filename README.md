@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sonora Client App - Portal de Práctica Musical 🎵
 
-## Getting Started
+Portal web exclusivo de solo lectura para clientes y alumnos, diseñado para explorar, reproducir y practicar interactivamente ejercicios musicales (Batería, Bajo, Guitarra y Piano) creados en el Studio Builder.
 
-First, run the development server:
+---
 
+## 🚀 Características Principales
+
+- **Acceso Exclusivo de Solo Lectura:** Sin barras de edición, formularios de creación ni botones destructivos.
+- **Catálogo Público de Ejercicios:**
+  - Filtro por instrumento: *Todos*, *Bajo*, *Guitarra*, *Piano* y *Batería*.
+  - Buscador en tiempo real por título y categoría.
+  - Tarjetas interactivas con tempo (BPM), número de compases y nivel de dificultad.
+- **Atril de Práctica Interactivo:**
+  - Visualizador de partitura/tablatura SVG multi-compás continuo con renderizado por sistemas y clave musical dinámica.
+  - Cursor de reproducción animado (`playhead`) sincronizado en tiempo real con auto-scroll suave.
+  - Control de velocidad porcentual (`50%`, `75%`, `100%`) con recálculo dinámico de BPM.
+  - Metrónomo sonoro integrable y cuenta atrás visual (3, 2, 1) antes de comenzar la sesión.
+  - Modo bucle continuo (`Loop ON / OFF`).
+- **Motores de Audio Acústicos y Síntesis Nativa:**
+  - **Piano de Cola:** Muestras de audio acústico (*FluidR3_GM*) con pitch-shifting y control de velocidad.
+  - **Bajo y Guitarra:** Síntesis nativa con Web Audio API (formas de onda optimizadas, filtros paso bajo y curvas ADSR).
+  - **Batería:** Sintetizador analógico de bombo, caja y platos (white noise buffers).
+- **Conectividad Cloud:** Conectado directamente a **Neon PostgreSQL** a través de **Prisma ORM**.
+
+---
+
+## 🛠️ Tecnologías
+
+- **Framework:** [Next.js](https://nextjs.org/) (App Router, Turbopack, Cache Components)
+- **Lenguaje:** [TypeScript](https://www.typescriptlang.org/)
+- **Estilos:** [Tailwind CSS v4](https://tailwindcss.com/)
+- **ORM & Base de Datos:** [Prisma ORM](https://www.prisma.io/) + [Neon PostgreSQL](https://neon.tech/)
+- **Audio:** Web Audio API nativo del navegador
+
+---
+
+## 📦 Instalación y Puesta en Marcha
+
+### 1. Clonar el repositorio
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/abel322/practica-instrumento-cliente.git
+cd practica-instrumento-cliente
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Instalar dependencias
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Configurar variables de entorno
+Crea un archivo `.env` en la raíz del proyecto basándote en `.env.example`:
+```env
+DATABASE_URL="postgresql://usuario:contraseña@ep-xxxx.aws.neon.tech/nombre-db?sslmode=require"
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 4. Generar el cliente de Prisma
+```bash
+npx prisma generate
+```
 
-## Learn More
+### 5. Iniciar el servidor de desarrollo
+```bash
+npm run dev
+```
+Abre tu navegador en [http://localhost:3000](http://localhost:3000).
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📁 Estructura del Proyecto
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```text
+sonora-client-app/
+├── app/
+│   ├── api/
+│   │   └── exercises/[id]/route.ts  # Endpoint de lectura por ID
+│   ├── practice/[id]/page.tsx       # Atril de práctica interactivo
+│   ├── layout.tsx                   # Layout global con metadatos
+│   └── page.tsx                     # Catálogo público con filtros y búsqueda
+├── components/
+│   └── ScoreViewer.tsx              # Renderizador SVG multi-compás
+├── lib/
+│   ├── audio/
+│   │   └── clientAudioEngines.ts    # Motores de audio Web Audio API
+│   ├── exercises.ts                 # Normalizador y consultas Neon DB
+│   └── prisma.ts                    # Cliente Prisma Singleton
+└── prisma/
+    └── schema.prisma                # Esquema introspectado de Neon DB
+```
