@@ -1,29 +1,36 @@
 // app/api/exercises/[id]/route.ts
 import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 import { getExerciseById } from '@/lib/exercises';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  props: { params: Promise<{ id: string }> }
 ) {
   try {
-    const resolvedParams = await params;
-    const id = resolvedParams?.id;
+    const { id } = await props.params;
 
     if (!id) {
-      return NextResponse.json({ error: 'ID requerido' }, { status: 400 });
+      return NextResponse.json({ error: 'ID no proporcionado' }, { status: 400 });
     }
 
-    const exercise = await getExerciseById(id);
+    let exercise: any = await getExerciseById(id);
+
+    if (!exercise && typeof (prisma as any).exercise?.findUnique === 'function') {
+      exercise = await (prisma as any).exercise.findUnique({
+        where: { id },
+      }).catch(() => null);
+    }
 
     if (!exercise) {
-      return NextResponse.json({ error: 'No encontrado' }, { status: 404 });
+      return NextResponse.json({ error: 'Ejercicio no encontrado' }, { status: 404 });
     }
 
     return NextResponse.json({ exercise });
   } catch (error) {
-    console.error('Error en API exercises/[id]:', error);
-    return NextResponse.json({ error: 'Error del servidor' }, { status: 500 });
+    console.error('Error al obtener ejercicio:', error);
+    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }
-
